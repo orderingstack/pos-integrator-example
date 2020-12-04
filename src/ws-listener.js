@@ -19,9 +19,9 @@ async function connectWebSockets(tenant, venue, accessTokenProviderCallbackAsync
             passcode: null
         },
         debug: function (a) {
-            console.log(a);
+            //console.log(a);
         },
-        reconnectDelay: 30000,
+        reconnectDelay: 20000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
 
@@ -46,7 +46,7 @@ async function connectWebSockets(tenant, venue, accessTokenProviderCallbackAsync
 
         onDisconnect: async function () {
             await _onDisconnectAsync();
-            console.log('Websocket disconnected :-( ');
+            console.log('Websocket disconnected.');
         },
 
         onStompError: function (frame) {
@@ -58,9 +58,11 @@ async function connectWebSockets(tenant, venue, accessTokenProviderCallbackAsync
             console.error('Additional details: ' + frame.body);
         },
         onWebSocketClose: function(e) {
+            console.log('Websocket closed.');
             //console.log(e);
         },
         onWebSocketError: function (e){
+            console.log('Websocket error.');
             //console.log(e);
         },
         onUnhandledMessage: function(m) {

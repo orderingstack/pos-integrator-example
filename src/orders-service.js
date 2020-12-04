@@ -60,7 +60,7 @@ Pulls open orders for venue. Uses provided access token to authenticate to rest 
 * @param {*} token - access token   
  */
 async function pullOrders(venue, token) {
-  console.log('pulling orders');
+  console.log('Pulling orders...');
   let response = null;
   try {
       response = await axios({

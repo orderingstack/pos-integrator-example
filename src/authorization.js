@@ -30,7 +30,7 @@ const authorize = async (baseUrl, tenant, basicAuthPass, username) => {
     }
 }
 
-async function savePassword(user, password) {
+async function savePasswordForUser(user, password) {
     await keytar.setPassword('OrderingStack', user, password);
 }
 
@@ -40,5 +40,5 @@ async function getPassword(user) {
 }
 
 module.exports = {
-    authorize
+    authorize, savePasswordForUser
 }

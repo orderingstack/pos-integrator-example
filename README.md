@@ -18,6 +18,7 @@ create and edit .env file and place there following parameters:
 * VENUE - venue Id 
 * BASE_URL - Ordering API url 
 * BASIC_AUTH - Basic auth for API encoded in Base64
+* USER_NAME - Account user name for authorization of integration module  (application will ask about the password)
 
 ```
 npm install
