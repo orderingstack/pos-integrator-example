@@ -4,7 +4,9 @@ const { getOrder } = require('../src/db/orders-dao');
 
 const TEST_DB_FILENAME = './data/test.db';
 
-fs.unlinkSync(TEST_DB_FILENAME) //Removed test.db file before tests.
+if (fs.existsSync(TEST_DB_FILENAME)) {
+    fs.unlinkSync(TEST_DB_FILENAME) //Remove test.db file before tests.
+}
 
 test('create db from migration', ()=>{
     orderDao.createDatabase(TEST_DB_FILENAME);
