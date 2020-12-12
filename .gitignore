@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /dist
+/data
 /.pnp
 .pnp.js
 

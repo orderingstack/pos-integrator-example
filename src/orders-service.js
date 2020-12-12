@@ -1,58 +1,26 @@
-const posIntegration = require( './pos/pos-integration-impl.js')
-const  schedule = require('node-schedule');
+const posIntegration = require('./pos-integrations/pos-example.js')
 const axios = require('axios');
+const orderDao = require('./db/orders-dao');
+const schedule = require('node-schedule'); 
 
-const orderMap = [];
-
-/* run every hour */
-schedule.scheduleJob('0 * * * *', function(){  
-  purgeOrderMapFromOldOrders();
-});
-
-function purgeOrderMapFromOldOrders() {
-  console.log('purge order map');
-}
-
-function addToOrderMap(order) {
-  if (!orderMap[order.id]) { //new order 
-    orderMap[order.id] = order;
-    return true;    
-  } else { //we have that order
-    return false;
-  }
-}
-
-function orderIdExists(id) {
-  return (orderMap[id]!=null);
-}
+const DB_ORDERS_RETENTION_DAYS = 4;
 
 async function pullAndProcessOrders(venue, token) {
   const orders = await pullOrders(venue, token);
   for (const order of orders) {
-    if (/*!order.getExta('is-pos-sync')*/ !orderIdExists(order.id)) {
-      await posIntegration.insertNewOrderToPOS(order)
-    }
+    orderDao.upsertOrder(order);
   };
 }
 
-
-async function inserOrderIntoPOS(message) {
+async function processOrder(message) {
   const order = message;
   try {
-    if (!orderIdExists(order.id)) {
-      addToOrderMap(order);
-      const result = await posIntegration.insertNewOrderToPOS(order);
-    }
-    //osOrderTools.setExtra('is-pos-sync', true);
+    orderDao.upsertOrder(order);
   } catch (ex) {
     console.error(ex);
-  }  
-  //error handling
+  }
 }
 
-module.exports = {
-  pullAndProcessOrders, inserOrderIntoPOS
-}
 
 /**
 Pulls open orders for venue. Uses provided access token to authenticate to rest api.   
@@ -63,24 +31,57 @@ async function pullOrders(venue, token) {
   console.log('Pulling orders...');
   let response = null;
   try {
-      response = await axios({
-          method: 'get',
-          url: `${process.env.BASE_URL}/ordering-api/api/orders/venue/${venue}`,
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-          },
-      });
-      const orders = [];
-      for (const o of response.data) {
-        if (o.completed) {
-          orders.push(o);
-        }
+    response = await axios({
+      method: 'get',
+      url: `${process.env.BASE_URL}/ordering-api/api/orders/venue/${venue}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const orders = [];
+    for (const o of response.data) {
+      if (o.completed) {
+        orders.push(o);
       }
-      return orders;
+    }
+    return orders;
   } catch (error) {
     console.error(error);
     return [];
   }
 }
 
+function initOrderService() {
+  orderDao.createDatabase();
+
+  /* run every hour */
+  schedule.scheduleJob('0 * * * *', function () {
+    purgeOrderMapFromOldOrders();
+  });
+  /* run every 30 seconds */
+  schedule.scheduleJob('*/30 * * * * *', function () {
+    processOrdersFromDB();
+  });
+}
+
+function purgeOrderMapFromOldOrders() {
+  orderDao.removeOlderThan(DB_ORDERS_RETENTION_DAYS);
+}
+
+function processOrdersFromDB() {
+  const orders = orderDao.getNotProcessedOrders();
+  for (const order of orders) {
+    //do something with this order
+    posIntegration.insertNewOrderToPOS(order);
+    orderDao.setOrderAsProcessed(order.id);    
+  };
+}
+
+
+
+module.exports = {
+  pullAndProcessOrders, processOrder, initOrderService
+}
+
+//-------------------------
