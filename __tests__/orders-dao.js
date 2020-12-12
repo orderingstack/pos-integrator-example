@@ -2,14 +2,8 @@ const orderDao = require('../src/db/orders-dao');
 const fs = require('fs');
 const { getOrder } = require('../src/db/orders-dao');
 
-const TEST_DB_FILENAME = './data/test.db';
-
-if (fs.existsSync(TEST_DB_FILENAME)) {
-    fs.unlinkSync(TEST_DB_FILENAME) //Remove test.db file before tests.
-}
-
 test('create db from migration', ()=>{
-    orderDao.createDatabase(TEST_DB_FILENAME);
+    orderDao.createDatabase(':memory:');
 });
 
 test('upsert order and check is it is added', ()=>{
