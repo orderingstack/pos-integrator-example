@@ -1,8 +1,11 @@
-const listener = require('./ws-listener');
-const orderService = require('./orders-service');
-const authorization = require('./authorization');
+const posIntegratorCore = require('@orderingstack/pos-integrator-core');
+const listener = posIntegratorCore.listener;
+const orderService = posIntegratorCore.orderService;
+const authorization = posIntegratorCore.authorization;
 const figlet = require('figlet');
 require('dotenv').config();
+
+const posExampleImpl = require('./pos-example');
 
 async function init() {
   console.log(figlet.textSync('Ordering Stack', {
@@ -11,7 +14,7 @@ async function init() {
     verticalLayout: 'default'
   }));
   console.log(`Ordering Stack POS Integrator v. 0.0.1`);
-  orderService.initOrderService();
+  orderService.initOrderService(posExampleImpl.insertNewOrderToPOS);
   const accessToken = await authorization.checkAndOptionallyAskForCredentials(process.env.USER_NAME, accessTokenProviderCallbackAsync);
   listener.connectWebSockets(
     process.env.TENANT, process.env.VENUE,
@@ -41,7 +44,6 @@ function onDisconnect() {
 async function onMessage(message, accessToken) {
   await orderService.processOrder(message, accessToken);
 }
-
 
 (async () => {
   try {

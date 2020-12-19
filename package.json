@@ -1,35 +1,21 @@
 {
   "name": "pos-integrator-example",
   "version": "0.0.1",
-  "description": "Ordering Stack POS integrator - starter for building your own POS integrations",
+  "description": "Example showing how to integrate POS with Ordering Stack (it is starter for building your own POS integrations)",
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "LK",
+  "license": "MIT",
   "dependencies": {
-    "@stomp/stompjs": "6.0.0",
-    "applicationinsights": "^1.7.3",
-    "axios": "^0.19.2",
-    "better-sqlite3": "^7.1.1",
-    "cors": "^2.8.5",
+    "@orderingstack/pos-integrator-core": "^0.1.6",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "figlet": "^1.5.0",
-    "iconv-lite": "^0.6.2",
-    "inquirer": "^7.3.3",
-    "jfs": "^0.3.0",
-    "keytar": "^7.2.0",
-    "node-schedule": "^1.3.2",
-    "sockjs-client": "^1.4.0",
-    "text-encoding": "^0.7.0",
-    "xml2js": "^0.4.23"
+    "figlet": "^1.5.0"
   },
   "devDependencies": {
-    "jest": "^25.1.0",
-    "supertest": "^4.0.2"
+    "jest": "^26.6.3"
   },
   "pkg": {
     "assets": []
